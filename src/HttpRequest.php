@@ -28,15 +28,11 @@ class HttpRequest
 
     function __construct($url)
     {
-        $url = 'http://www.web07.vivastreet.com/videos/vzaar_notification.php';
-
         if (!function_exists('curl_init')) {
             echo "Function curl_init, used by HttpRequest does not exist.\n";
         }
         $this->url = $url;
         $this->c = curl_init($this->url);
-
-        var_dump($this->url);
 
         $this->client = new Client();
     }
@@ -110,18 +106,6 @@ class HttpRequest
 
     function sendCurl($data = null, $filepath = null)
     {
-        $new_filepath = __DIR__ . '/../../sample.mp4';
-        $filepath = $new_filepath;
-
-        // $this->sendGuzzle($data, $filepath);
-
-        // var_dump($filepath);
-        // $client = new Client(['verify' => false]);
-
-        // var_dump('$client');
-
-        var_dump($filepath, $data, $this->method);
-
         if (count($this->headers) > 0) {
             curl_setopt($this->c, CURLOPT_HEADER, false);
             curl_setopt($this->c, CURLOPT_HTTPHEADER, $this->headers);
@@ -179,13 +163,6 @@ class HttpRequest
             curl_setopt($this->c, CURLOPT_FOLLOWLOCATION, false);
             $output = $this->curlExec($this->c);
         }
-
-        // echo '$output';
-
-
-        var_dump(file_exists($new_filepath));
-
-        var_dump($new_filepath, $this->headers, $filepath, $this->url, '$output', $output);
 
         return $output;
     }
