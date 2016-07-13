@@ -69,15 +69,15 @@ class HttpRequest
                             $fp
                         );
 
-                    // // Should do the same as above
-                    // $response = $this->client->request(
-                    //     'POST'
-                    //     $this->url,
-                    //     [
-                    //         'headers' => $headers
-                    //         'body' => $fp
-                    //     ]
-                    // );
+                        // // Should do the same as above
+                        // $response = $this->client->request(
+                        //     'POST'
+                        //     $this->url,
+                        //     [
+                        //         'headers' => $headers
+                        //         'body' => $fp
+                        //     ]
+                        // );
                     // } catch (\GuzzleHttp\Exception\ServerException $e) {
                     //     $response = $e->getResponse();
                     // }
