@@ -2,6 +2,9 @@
 
 namespace Vzaar;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+
 /**
  * HttpRequest
  *
@@ -25,112 +28,170 @@ class HttpRequest
 
     function __construct($url)
     {
-        // if (!function_exists('curl_init')) {
-        //     echo "Function curl_init, used by HttpRequest does not exist.\n";
-        // }
-        // $this->url = $url;
-        // $this->c = curl_init($this->url);
-        
+        $url = 'http://www.web07.vivastreet.com/videos/vzaar_notification.php';
+
+        if (!function_exists('curl_init')) {
+            echo "Function curl_init, used by HttpRequest does not exist.\n";
+        }
         $this->url = $url;
-        $this->client = new Client(['verify' => false]);
+        $this->c = curl_init($this->url);
+
+        var_dump($this->url);
+
+        $this->client = new Client();
     }
 
     function send($data = null, $filepath = null)
     {
-        // if (count($this->headers) > 0) {
-        //     curl_setopt($this->c, CURLOPT_HEADER, false);
-        //     curl_setopt($this->c, CURLOPT_HTTPHEADER, $this->headers);
-        // }
+        if (count($this->headers) > 0) {
+            $headers = [];
 
-        // curl_setopt($this->c, CURLOPT_RETURNTRANSFER, true);
-
-        // if ($this->useSsl) {
-        //     curl_setopt($this->c, CURLOPT_SSL_VERIFYPEER, 0);
-        //     curl_setopt($this->c, CURLOPT_SSL_VERIFYHOST, 0);
-        // }
-
-        // if ($this->preventCaching) {
-        //     curl_setopt($this->c, CURLOPT_FORBID_REUSE, true);
-        //     curl_setopt($this->c, CURLOPT_FRESH_CONNECT, true);
-        // }
-
-        // if ($this->uploadMode) {
-        //     //curl_setopt($this->c, CURLOPT_URL, $filepath);
-        //     //curl_setopt($this->c, CURLOPT_UPLOAD, true);
-        //     curl_setopt($this->c, CURLOPT_POST, true);
-        //     $fp = fopen($filepath, 'r');
-        //     curl_setopt($this->c, CURLOPT_INFILE, $fp);
-        //     curl_setopt($this->c, CURLOPT_INFILESIZE, filesize($filepath));
-        // }
-
-        // switch (strtoupper($this->method)) {
-        //     case 'POST':
-        //         curl_setopt($this->c, CURLOPT_POST, true);
-        //         if ($data != null)
-        //             curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
-        //         break;
-
-        //     case 'HEAD':
-        //         curl_setopt($this->c, CURLOPT_NOBODY, true);
-        //         break;
-
-        //     case 'DELETE':
-        //         curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "DELETE");
-        //         break;
-
-        //     case 'PUT':
-        //         curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "PUT");
-        //         if ($data != null)
-        //             curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
-        //         break;
-        // }
-
-        try {
-            switch (strtoupper($this->method)) {
-                case 'POST':
-                    $response = $this->client->request('POST', $this->url, ['json' => $data]);
-                    
-                    if ($data != null) {
-                        // curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
-                    }
-                    break;
-    
-                case 'HEAD':
-                    // curl_setopt($this->c, CURLOPT_NOBODY, true);
-                    break;
-    
-                case 'DELETE':
-                    // curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "DELETE");
-                    break;
-    
-                case 'PUT':
-                    // curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "PUT");
-                    if ($data != null) {
-                        curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
-                    }
-                    
-                    break;
+            foreach ($this->headers as $header) {
+                $param = explode(":", $header);
+                $headers[$param[0]] = $param[1];
             }
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $response = $e->getResponse();
+
+            $this->client->setDefaultOption('headers', $headers);
         }
 
-        // curl_setopt($this->c, CURLOPT_VERBOSE, $this->verbose);
+        var_dump($headers, $data, $this->method);
 
-        // if (ini_get('open_basedir') == '' && ini_get('safe_mode' == 'Off')) {
-        //     curl_setopt($this->c, CURLOPT_FOLLOWLOCATION, true);
-        //     $output = curl_exec($this->c);
-        // } else {
-        //     curl_setopt($this->c, CURLOPT_FOLLOWLOCATION, false);
-        //     $output = $this->curlExec($this->c);
-        // }
+        switch (strtoupper($this->method)) {
+            case 'POST':
+                if ($data !== null) {
+                    // try {
+                        $response = $this->client->put(
+                            $this->url,
+                            [
+                                'headers' => $headers,
+                                'body' => $data
+                            ]
+                        );
+                    // } catch (\GuzzleHttp\Exception\ServerException $e) {
+                    //     $response = $e->getResponse();
+                    // }
+                }
+
+                // curl_setopt($this->c, CURLOPT_POST, true);
+                // if ($data != null)
+                //     curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
+                break;
+
+            case 'HEAD':
+                $request = $this->client->head($this->url);
+                // curl_setopt($this->c, CURLOPT_NOBODY, true);
+                break;
+
+            case 'DELETE':
+                $request = $this->client->delete($this->url);
+                // curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "DELETE");
+                break;
+
+            case 'PUT':
+                if ($data !== null) {
+                    try {
+                        $response = $this->client->put($this->url, $headers, $data);
+                    } catch (\GuzzleHttp\Exception\ServerException $e) {
+                        $response = $e->getResponse();
+                    }
+
+                }
+
+                // curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "PUT");
+                // if ($data != null)
+                //     curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
+                break;
+        }
+
+        var_dump('$response', $response);
 
         return $response;
     }
 
+    function sendCurl($data = null, $filepath = null)
+    {
+        $new_filepath = __DIR__ . '/../../sample.mp4';
+        $filepath = $new_filepath;
+
+        // $this->sendGuzzle($data, $filepath);
+
+        // var_dump($filepath);
+        // $client = new Client(['verify' => false]);
+
+        // var_dump('$client');
+
+        var_dump($filepath, $data, $this->method);
+
+        if (count($this->headers) > 0) {
+            curl_setopt($this->c, CURLOPT_HEADER, false);
+            curl_setopt($this->c, CURLOPT_HTTPHEADER, $this->headers);
+        }
+
+        curl_setopt($this->c, CURLOPT_RETURNTRANSFER, true);
+
+        if ($this->useSsl) {
+            curl_setopt($this->c, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($this->c, CURLOPT_SSL_VERIFYHOST, 0);
+        }
+
+        if ($this->preventCaching) {
+            curl_setopt($this->c, CURLOPT_FORBID_REUSE, true);
+            curl_setopt($this->c, CURLOPT_FRESH_CONNECT, true);
+        }
+
+        if ($this->uploadMode) {
+            //curl_setopt($this->c, CURLOPT_URL, $filepath);
+            //curl_setopt($this->c, CURLOPT_UPLOAD, true);
+            curl_setopt($this->c, CURLOPT_POST, true);
+            $fp = fopen($filepath, 'r');
+            curl_setopt($this->c, CURLOPT_INFILE, $fp);
+            curl_setopt($this->c, CURLOPT_INFILESIZE, filesize($filepath));
+        }
+
+        switch (strtoupper($this->method)) {
+            case 'POST':
+                curl_setopt($this->c, CURLOPT_POST, true);
+                if ($data != null)
+                    curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
+                break;
+
+            case 'HEAD':
+                curl_setopt($this->c, CURLOPT_NOBODY, true);
+                break;
+
+            case 'DELETE':
+                curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "DELETE");
+                break;
+
+            case 'PUT':
+                curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "PUT");
+                if ($data != null)
+                    curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
+                break;
+        }
+
+        curl_setopt($this->c, CURLOPT_VERBOSE, $this->verbose);
+
+        if (ini_get('open_basedir') == '' && ini_get('safe_mode' == 'Off')) {
+            curl_setopt($this->c, CURLOPT_FOLLOWLOCATION, true);
+            $output = curl_exec($this->c);
+        } else {
+            curl_setopt($this->c, CURLOPT_FOLLOWLOCATION, false);
+            $output = $this->curlExec($this->c);
+        }
+
+        // echo '$output';
+
+
+        var_dump(file_exists($new_filepath));
+
+        var_dump($new_filepath, $this->headers, $filepath, $this->url, '$output', $output);
+
+        return $output;
+    }
+
     function curlExec($ch)
     {
-
         $newUrl = '';
         $maxRedirection = 10;
         do {
