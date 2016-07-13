@@ -68,6 +68,16 @@ class HttpRequest
                             $headers,
                             $fp
                         );
+
+                    // // Should do the same as above
+                    // $response = $this->client->request(
+                    //     'POST'
+                    //     $this->url,
+                    //     [
+                    //         'headers' => $headers
+                    //         'body' => $fp
+                    //     ]
+                    // );
                     // } catch (\GuzzleHttp\Exception\ServerException $e) {
                     //     $response = $e->getResponse();
                     // }
@@ -99,12 +109,15 @@ class HttpRequest
                         $fp
                     );
 
-                    // try {
-                    //     $response = $this->client->put($this->url, $headers, $data);
-                    // } catch (\GuzzleHttp\Exception\ServerException $e) {
-                    //     $response = $e->getResponse();
-                    // }
-
+                    // // Should do the same as above
+                    // $response = $this->client->request(
+                    //     'PUT'
+                    //     $this->url,
+                    //     [
+                    //         'headers' => $headers
+                    //         'body' => $fp
+                    //     ]
+                    // );
                 }
 
                 // curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "PUT");
