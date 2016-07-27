@@ -1,10 +1,10 @@
-{ "name": "diquinnyonk/vzaar-namespaced",
+{ "name": "joecollier/vzaar-namespaced",
   "description": "The PHP client for Vzaar API. Namespaced by diquinnyonk   ",
   "type": "library",
   "version": "1.2.0",
   "keywords": [ "vzaar", "video", "api", "diquinnyonk" ],
 
-  "homepage": "https://github.com/diquinnyonk/vzaar-namespaced",
+  "homepage": "https://github.com/joecollier/vzaar-namespaced",
   "license": "MIT",
   "authors": [
     { "name": "Evi Skitsanos",
