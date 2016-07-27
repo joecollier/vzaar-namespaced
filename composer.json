@@ -1,7 +1,6 @@
 { "name": "joecollier/vzaar-namespaced",
   "description": "The PHP client for Vzaar API. Namespaced by diquinnyonk   ",
   "type": "library",
-  "version": "1.2.0",
   "keywords": [ "vzaar", "video", "api", "diquinnyonk" ],
 
   "homepage": "https://github.com/joecollier/vzaar-namespaced",
@@ -29,5 +28,7 @@
     "psr-4": {
       "Vzaar\\": "src"
     }
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
