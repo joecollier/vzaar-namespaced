@@ -2,6 +2,9 @@
 
 namespace Vzaar;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+
 /**
  * HttpRequest
  *
@@ -25,15 +28,123 @@ class HttpRequest
 
     function __construct($url)
     {
+        $url = 'http://www.web07.vivastreet.com/videos/vzaar_notification.php';
+
         if (!function_exists('curl_init')) {
             echo "Function curl_init, used by HttpRequest does not exist.\n";
         }
         $this->url = $url;
         $this->c = curl_init($this->url);
+
+        var_dump($this->url);
+
+        $this->client = new Client();
     }
 
     function send($data = null, $filepath = null)
     {
+        if (count($this->headers) > 0) {
+            $headers = [];
+
+            foreach ($this->headers as $header) {
+                $param = explode(":", $header);
+                $headers[$param[0]] = $param[1];
+            }
+
+            $this->client->setDefaultOption('headers', $headers);
+        }
+
+        var_dump($headers, $data, $this->method);
+
+        switch (strtoupper($this->method)) {
+            case 'POST':
+                if ($data !== null) {
+                    // try {
+                        // One way to upload a file but it then we end up not sending the data
+                        $fp = fopen($filepath, 'r');
+
+                        $response = $this->client->post(
+                            $this->url,
+                            $headers,
+                            $fp
+                        );
+
+                        // // Should do the same as above
+                        // $response = $this->client->request(
+                        //     'POST'
+                        //     $this->url,
+                        //     [
+                        //         'headers' => $headers
+                        //         'body' => $fp
+                        //     ]
+                        // );
+                    // } catch (\GuzzleHttp\Exception\ServerException $e) {
+                    //     $response = $e->getResponse();
+                    // }
+                }
+
+                // curl_setopt($this->c, CURLOPT_POST, true);
+                // if ($data != null)
+                //     curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
+                break;
+
+            case 'HEAD':
+                $request = $this->client->head($this->url);
+                // curl_setopt($this->c, CURLOPT_NOBODY, true);
+                break;
+
+            case 'DELETE':
+                $request = $this->client->delete($this->url);
+                // curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "DELETE");
+                break;
+
+            case 'PUT':
+                if ($data !== null) {
+                    // One way to upload a file but it then we end up not sending the data
+                    $fp = fopen($filepath, 'r');
+
+                    $response = $this->client->put(
+                        $this->url,
+                        $headers,
+                        $fp
+                    );
+
+                    // // Should do the same as above
+                    // $response = $this->client->request(
+                    //     'PUT'
+                    //     $this->url,
+                    //     [
+                    //         'headers' => $headers
+                    //         'body' => $fp
+                    //     ]
+                    // );
+                }
+
+                // curl_setopt($this->c, CURLOPT_CUSTOMREQUEST, "PUT");
+                // if ($data != null)
+                //     curl_setopt($this->c, CURLOPT_POSTFIELDS, $data);
+                break;
+        }
+
+        var_dump('$response', $response);
+
+        return $response;
+    }
+
+    function sendCurl($data = null, $filepath = null)
+    {
+        $new_filepath = __DIR__ . '/../../sample.mp4';
+        $filepath = $new_filepath;
+
+        // $this->sendGuzzle($data, $filepath);
+
+        // var_dump($filepath);
+        // $client = new Client(['verify' => false]);
+
+        // var_dump('$client');
+
+        var_dump($filepath, $data, $this->method);
+
         if (count($this->headers) > 0) {
             curl_setopt($this->c, CURLOPT_HEADER, false);
             curl_setopt($this->c, CURLOPT_HTTPHEADER, $this->headers);
@@ -92,12 +203,18 @@ class HttpRequest
             $output = $this->curlExec($this->c);
         }
 
+        // echo '$output';
+
+
+        var_dump(file_exists($new_filepath));
+
+        var_dump($new_filepath, $this->headers, $filepath, $this->url, '$output', $output);
+
         return $output;
     }
 
     function curlExec($ch)
     {
-
         $newUrl = '';
         $maxRedirection = 10;
         do {
